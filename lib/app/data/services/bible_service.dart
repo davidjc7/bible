@@ -1,9 +1,8 @@
 import 'dart:convert';
 
-import 'package:bible/app/data/core/app_urls.dart';
-import 'package:bible/app/data/core/rest_client.dart';
+import 'package:bible/app/core/app_urls.dart';
+import 'package:bible/app/core/rest_client.dart';
 
-/// Serviço para interagir com a API da Bíblia Digital.
 class BibleService {
   final RestClient _restClient = RestClient(baseUrl: AppUrls.baseUrl);
 

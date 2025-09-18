@@ -1,32 +1,34 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
+
+import 'package:bible/app/core/app_urls.dart';
+import 'package:bible/app/core/rest_client.dart';
 
 class AuthService {
-  final String _baseUrl = 'https://www.abibliadigital.com.br/api';
+  final RestClient _restClient = RestClient(baseUrl: AppUrls.baseUrl);
 
   Future<Map<String, dynamic>> login(String email, String password) async {
-    final response = await http.put(
-      Uri.parse('$_baseUrl/users/token'),
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode({'email': email, 'password': password}),
-    );
-
-    if (response.statusCode == 200) {
+    try {
+      final response = await _restClient.put(
+        AppUrls.login,
+        body: {
+          'email': email,
+          'password': password,
+        },
+      );
       return json.decode(response.body);
-    } else {
+    } catch (e) {
       throw Exception('Falha ao fazer login. Verifique suas credenciais.');
     }
   }
 
   Future<Map<String, dynamic>> getUser(String email, String token) async {
-    final response = await http.get(
-      Uri.parse('$_baseUrl/users/$email'),
-      headers: {'Authorization': 'Bearer $token'},
-    );
-
-    if (response.statusCode == 200) {
+    try {
+      final response = await _restClient.get(
+        AppUrls.user(email),
+        headers: {'Authorization': 'Bearer $token'},
+      );
       return json.decode(response.body);
-    } else {
+    } catch (e) {
       throw Exception('Falha ao buscar dados do usuário.');
     }
   }

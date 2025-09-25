@@ -1,35 +1,26 @@
-import 'dart:convert';
-
-import 'package:bible/app/core/app_urls.dart';
-import 'package:bible/app/core/rest_client.dart';
+import 'package:bible/app/data/core/rest_client.dart';
+import 'package:bible/app/data/models/user_model.dart';
 
 class AuthService {
-  final RestClient _restClient = RestClient(baseUrl: AppUrls.baseUrl);
+  final RestClient _restClient;
 
-  Future<Map<String, dynamic>> login(String email, String password) async {
-    try {
-      final response = await _restClient.put(
-        AppUrls.login,
-        body: {
-          'email': email,
-          'password': password,
-        },
-      );
-      return json.decode(response.body);
-    } catch (e) {
-      throw Exception('Falha ao fazer login. Verifique suas credenciais.');
-    }
+  AuthService(this._restClient);
+
+  Future<User> register(String name, String email, String password, bool notifications) async {
+    final response = await _restClient.post('/users', {
+      'name': name,
+      'email': email,
+      'password': password,
+      'notifications': notifications,
+    });
+    return User.fromJson(response);
   }
 
-  Future<Map<String, dynamic>> getUser(String email, String token) async {
-    try {
-      final response = await _restClient.get(
-        AppUrls.user(email),
-        headers: {'Authorization': 'Bearer $token'},
-      );
-      return json.decode(response.body);
-    } catch (e) {
-      throw Exception('Falha ao buscar dados do usuário.');
-    }
+  Future<User> login(String email, String password) async {
+    final response = await _restClient.put('/users/token', {
+      'email': email,
+      'password': password,
+    });
+    return User.fromJson(response);
   }
 }

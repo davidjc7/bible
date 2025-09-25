@@ -2,29 +2,31 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class LocalStorageService {
   static const String _tokenKey = 'auth_token';
-
-  static LocalStorageService? _instance;
-  static SharedPreferences? _preferences;
-
-  static Future<LocalStorageService> getInstance() async {
-    if (_instance == null) {
-      _preferences = await SharedPreferences.getInstance();
-      _instance = LocalStorageService._();
-    }
-    return _instance!;
-  }
-
-  LocalStorageService._();
+  static const String _nameKey = 'user_name';
 
   Future<void> saveToken(String token) async {
-    await _preferences?.setString(_tokenKey, token);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_tokenKey, token);
   }
 
   Future<String?> getToken() async {
-    return _preferences?.getString(_tokenKey);
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_tokenKey);
   }
 
-  Future<void> deleteToken() async {
-    await _preferences?.remove(_tokenKey);
+  Future<void> clearToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_tokenKey);
+    await prefs.remove(_nameKey);
+  }
+
+  Future<void> saveUserName(String name) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_nameKey, name);
+  }
+
+  Future<String?> getUserName() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_nameKey);
   }
 }

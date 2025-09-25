@@ -1,7 +1,6 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
-
-import 'home_page.dart';
+import 'package:provider/provider.dart';
+import '../viewmodels/splash_viewmodel.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -14,31 +13,23 @@ class _SplashPageState extends State<SplashPage> {
   @override
   void initState() {
     super.initState();
-    Timer(const Duration(seconds: 3), () {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const HomePage()),
-      );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<SplashViewModel>().checkLoginStatus(context);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).primaryColor,
-      body: const Center(
+    return const Scaffold(
+      body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.book, color: Colors.white, size: 80),
+            Icon(Icons.book, size: 80, color: Colors.blue),
             SizedBox(height: 20),
-            Text(
-              'Bíblia Sagrada',
-              style: TextStyle(
-                fontSize: 28,
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            Text('Bible App', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+            SizedBox(height: 20),
+            CircularProgressIndicator(),
           ],
         ),
       ),

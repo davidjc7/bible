@@ -1,7 +1,6 @@
-import 'package:bible/app/data/services/local_storage_service.dart';
-
 import '../models/user_model.dart';
 import '../services/auth_service.dart';
+import '../services/local_storage_service.dart';
 
 class AuthRepository {
   final AuthService _authService;
@@ -9,28 +8,30 @@ class AuthRepository {
 
   AuthRepository(this._authService, this._localStorageService);
 
-  Future<UserModel> login(String email, String password) async {
-    final authData = await _authService.login(email, password);
-    final token = authData['token'];
+  String? _userNameCache;
 
-    await _localStorageService.saveToken(token);
-
-    return UserModel.fromJson(authData['user']);
+  Future<User> registerUser(String name, String email, String password, bool notifications) async {
+    final user = await _authService.register(name, email, password, notifications);
+    await _localStorageService.saveToken(user.token);
+    await _localStorageService.saveUserName(user.name);
+    _userNameCache = user.name;
+    return user;
   }
 
-  Future<void> logout() async {
-    await _localStorageService.deleteToken();
+  Future<User> loginUser(String email, String password) async {
+    final user = await _authService.login(email, password);
+    await _localStorageService.saveToken(user.token);
+    await _localStorageService.saveUserName(user.name);
+    _userNameCache = user.name;
+    return user;
   }
 
-  Future<String?> getToken() async {
-    return _localStorageService.getToken();
+  Future<void> logoutUser() async {
+    await _localStorageService.clearToken();
+    _userNameCache = null;
   }
 
-  Future<UserModel> getUser(String email) async {
-    final token = await getToken();
-    if (token == null) throw Exception('Usuário não autenticado.');
-
-    final rawUser = await _authService.getUser(email, token);
-    return UserModel.fromJson(rawUser);
+  Future<String?> getUserName() async {
+    return _userNameCache;
   }
 }

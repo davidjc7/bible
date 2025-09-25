@@ -5,6 +5,7 @@ class Book {
   final String name;
   final String author;
   final String group;
+  final String testament;
   final int chapters;
 
   Book({
@@ -12,6 +13,7 @@ class Book {
     required this.name,
     required this.author,
     required this.group,
+    required this.testament,
     required this.chapters,
   });
 
@@ -21,6 +23,7 @@ class Book {
       name: json['name'],
       author: json['author'],
       group: json['group'],
+      testament: json['testament'],
       chapters: json['chapters'],
     );
   }

@@ -1,37 +1,20 @@
-import 'dart:convert';
-
-import 'package:bible/app/core/app_urls.dart';
-import 'package:bible/app/core/rest_client.dart';
+import '../core/rest_client.dart';
+import '../models/book_model.dart';
+import 'local_storage_service.dart';
 
 class BibleService {
-  final RestClient _restClient = RestClient(baseUrl: AppUrls.baseUrl);
+  final RestClient _restClient;
+  final LocalStorageService _localStorageService;
 
-  /// Busca a lista de todos os livros.
-  Future<List<dynamic>> fetchBooks(String token) async {
-    try {
-      final response = await _restClient.get(
-        '/books',
-        headers: {'Authorization': 'Bearer $token'},
-      );
-      return json.decode(response.body);
-    } catch (e) {
-      throw Exception('Falha ao carregar os livros.');
-    }
-  }
+  BibleService(this._restClient, this._localStorageService);
 
-  /// Busca o conteúdo de um capítulo específico.
-  Future<Map<String, dynamic>> fetchChapter({
-    required String version,
-    required String abbrev,
-    required int chapter,
-    required String token,
-  }) async {
-    try {
-      final path = '/verses/$version/$abbrev/$chapter';
-      final response = await _restClient.get(path, headers: {'Authorization': 'Bearer $token'});
-      return json.decode(response.body);
-    } catch (e) {
-      throw Exception('Falha ao carregar o capítulo.');
-    }
+  Future<List<Book>> getBooks() async {
+    final token = await _localStorageService.getToken();
+
+    final response = await _restClient.get('/books', token: token);
+
+    final List<dynamic> bookListJson = response;
+
+    return bookListJson.map((json) => Book.fromJson(json)).toList();
   }
 }
